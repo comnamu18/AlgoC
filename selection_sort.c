@@ -1,53 +1,64 @@
 //Copyright to 20145523 KimSangHeon
-//2018-03-03
+//Last updated date : 2018-03-05
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 //Print Result Function
-void PrintArr (char* input, int N) {
-    int i = 0;
-    for ( i = 0; i < N; i++) {
+void PrintArr (int* input, int N) {
+    for ( int i = 0; i < N; i++) {
         printf("%d\n", input[i]);
     }
 }
 //Selection Sorting Function
-void SelectionSort (char* input, int N) {
-    int i, j, k, max, tmp;
+void SelectionSort (int* input, int N) {
+    int i, j, k;
     for ( i = 0; i < N - 1 ; i++) {
-        max = input[i];
         k = i;
         for ( j = i + 1; j < N; j++) {
-            if (input[j] > max) {
-                max = input[j];
+            if (input[j] > input[k]) {
                 k = j;
             }
         }
-        tmp = input[i];
-        input[i] = max;
-        input[k] = tmp;
+        if(k != i) {
+            input[i] += input[k];
+            input[k] = input[i] - input[k];
+            input[i] -= input[k];
+        }
     }
     PrintArr(input, N);
 }
 
 int main (int argc, char* argv[]) {
-    if (argc != 2 ) return 0; // Wrong input
+    if (argc != 3 ) exit(EXIT_FAILURE); // Wrong input
     clock_t starTime;
-    int N;
-    char* input;
+    int i, N, input;
+    int* inputN;
     FILE *fp;
 
     starTime = clock(); // Starting Time Checking
-    N = atoi(argv[0]);
-    input = (char*)malloc(sizeof(char) * N);
+    N = atoi(argv[1]);
+    inputN = (int*)malloc(sizeof(int) * N);
 
     //Read File
-    fp = fopen(argv[1], "r");
-    if (fscanf(fp, "%s", input) == EOF) return 0; //IF File is Empty
+    fp = fopen(argv[2], "r");
+    if (fp == NULL) exit(EXIT_FAILURE); // If file doesn't exist
+    i = 0;
+    while (i < N) {
+        //if N>K
+        if ((fscanf(fp, "%d\n", &input)) == EOF){
+            N = i;
+            break;
+        }
+        inputN[i] = input;
+        i++;
+    }
     fclose(fp);
 
-    SelectionSort(input, N);
+    SelectionSort(inputN, N);
 
-    //Print Total program time by milliseconds
+    //Print total program time by milliseconds
     printf("Running time = %f ms\n", ((float)(clock() - starTime)) / (CLOCKS_PER_SEC / 1000) );
+
+    return 0;
 }
