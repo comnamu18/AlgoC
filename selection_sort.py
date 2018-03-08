@@ -9,15 +9,17 @@ import gc
 def printArr(inputN):
     for i in inputN:
         print(i)
-#Insertion Sorting Function
-def InsertionSort (inputN, N) :
-    for i in range(1, N):
-        max = inputN[i]
-        j = i - 1
-        while j >= 0 and inputN[j] < max:
-            inputN[j + 1] = inputN[j]
-            inputN[j] = max
-            j = j - 1
+#Selection Sorting Function
+def SelectionSort (inputN, N) :
+    for i in range(0, N):
+        maxI = i
+        for j in range(i,N):
+            if inputN[j] > inputN[maxI]:
+                maxI = j
+        
+        tmp = inputN[maxI]
+        inputN[maxI] = inputN[i]
+        inputN[i] = tmp
 
 #Main part
 if len(sys.argv) != 3: sys.exit('wrong input length')
@@ -36,10 +38,10 @@ for i in range(0,N):
 
     inputN.append(inp)
 
-fp.close()
+fp.close()#free fp
 
 startTime = datetime.datetime.now()
-InsertionSort(inputN, N)
+SelectionSort(inputN, N)
 endTime = datetime.datetime.now() - startTime
 
 printArr(inputN)
