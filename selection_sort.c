@@ -12,53 +12,50 @@ void PrintArr (int* input, int N) {
 }
 //Selection Sorting Function
 void SelectionSort (int* input, int N) {
-    int i, j, k;
+    int i, j, maxI, tmp;
     for ( i = 0; i < N - 1 ; i++) {
-        k = i;
+        maxI = i;
         for ( j = i + 1; j < N; j++) {
-            if (input[j] > input[k]) {
-                k = j;
+            if ( input[j] > input[maxI]) {//Find max num
+                maxI = j;
             }
         }
-        if(k != i) {
-            input[i] += input[k];
-            input[k] = input[i] - input[k];
-            input[i] -= input[k];
-        }
+        tmp = input[maxI];
+        input[maxI] = input[i];
+        input[i] = tmp;
     }
-    PrintArr(input, N);
 }
 
 int main (int argc, char* argv[]) {
     if (argc != 3 ) exit(EXIT_FAILURE); // Wrong input
-    clock_t starTime;
+    clock_t startTime, endTime;
     int i, N, input;
     int* inputN;
     FILE *fp;
 
-    starTime = clock(); // Starting Time Checking
     N = atoi(argv[1]);
     inputN = (int*)malloc(sizeof(int) * N);
 
     //Read File
     fp = fopen(argv[2], "r");
     if (fp == NULL) exit(EXIT_FAILURE); // If file doesn't exist
-    i = 0;
-    while (i < N) {
-        //if N>K
-        if ((fscanf(fp, "%d\n", &input)) == EOF){
+    for ( i = 0; i < N; i++) {
+        if ((fscanf(fp, "%d\n", &input)) == EOF){//if N>K
             N = i;
             break;
         }
         inputN[i] = input;
-        i++;
     }
-    fclose(fp);
+    fclose(fp);// Free fp
 
+    startTime = clock(); // Starting Time Checking
     SelectionSort(inputN, N);
+    endTime = clock() - startTime;
 
-    //Print total program time by milliseconds
-    printf("Running time = %f ms\n", ((float)(clock() - starTime)) / (CLOCKS_PER_SEC / 1000) );
+    PrintArr(inputN, N);
+    //Print sorting time by milliseconds
+    printf("Running time = %f ms\n", ((float)(endTime)) / (CLOCKS_PER_SEC / 1000) );
 
+    free(inputN);// Free inputN
     return 0;
 }

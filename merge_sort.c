@@ -12,24 +12,22 @@ void PrintArr (int* input, int N) {
 }
 //Merge Sorting Function
 void MergeSort (int* input, int N) {
-
-    PrintArr(input, N);
+    
 }
 
 int main (int argc, char* argv[]) {
-    if (argc != 3 ) return 0; // Wrong input
-    clock_t starTime;
+    if (argc != 3 ) exit(EXIT_FAILURE); // Wrong input
+    clock_t startTime, endTime;
     int i, N, input;
     int* inputN;
     FILE *fp;
 
-    starTime = clock(); // Starting Time Checking
     N = atoi(argv[1]);
     inputN = (int*)malloc(sizeof(int) * N);
 
     //Read File
     fp = fopen(argv[2], "r");
-    if (fp == NULL) return 0; // If file doesn't exist
+    if (fp == NULL) exit(EXIT_FAILURE); // If file doesn't exist
     i = 0;
     while (i < N) {
         //if N>K
@@ -40,10 +38,17 @@ int main (int argc, char* argv[]) {
         inputN[i] = input;
         i++;
     }
-    fclose(fp);
+    fclose(fp);// Free fp
 
+    startTime = clock(); // Starting Time Checking  
     MergeSort(inputN, N);
+    endTime = clock() - startTime;
 
+    PrintArr(inputN, N);
     //Print total program time by milliseconds
-    printf("Running time = %f ms\n", ((float)(clock() - starTime)) / (CLOCKS_PER_SEC / 1000) );
+    printf("Running time = %f ms\n", ((float)(endTime)) / (CLOCKS_PER_SEC / 1000) );
+
+    free(inputN);// Free inputN
+    return 0;
+
 }
