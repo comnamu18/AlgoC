@@ -1,12 +1,13 @@
 //Copyright to 20145523 KimSangHeon
-//Last updated date : 2018-03-05
+//Last updated date : 2018-03-09
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 //Print Result Function
 void PrintArr (int* input, int N) {
-    for ( int i = 0; i < N; i++) {
+    int i;
+    for ( i = 0; i < N; i++) {
         printf("%d\n", input[i]);
     }
 }
@@ -52,7 +53,7 @@ int main (int argc, char* argv[]) {
     
     PrintArr(inputN, N);
     //Print sorting time by milliseconds
-    printf("Running time = %d ms\n", ((int)(endTime)) );
+    printf("Running time = %d ms\n", (int)((float)(endTime) / (CLOCKS_PER_SEC / 1000)) );
 
     free(inputN);// Free inputN
     return 0;
