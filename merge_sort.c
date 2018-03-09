@@ -85,7 +85,7 @@ int main (int argc, char* argv[]) {
 
     PrintArr(inputN, N);
     //Print sorting time by milliseconds
-    printf("Running time = %d ms\n", (int)((float)(endTime) / (CLOCKS_PER_SEC / 1000)) );
+    printf("Running time = %f ms\n", ((float)(endTime) / (CLOCKS_PER_SEC / 1000)) );
 
     free(inputN);// Free inputN
     return 0;
