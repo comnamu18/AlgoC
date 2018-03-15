@@ -1,8 +1,9 @@
 //Copyright to 20145523 KimSangHeon
-//Last updated date : 2018-03-09
+//Last updated date : 2018-03-15
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 //Print Result Function
 void PrintArr (int* input, int N) {
@@ -25,19 +26,26 @@ void InsertionSort (int* input, int N) {
 }
 
 int main (int argc, char* argv[]) {
-    if (argc != 3 ) exit(EXIT_FAILURE); // Wrong input
-    clock_t startTime, endTime;
-    int i, N, input;
-    int* inputN;
+    // Wrong command line input
+    if (argc != 3 ) exit(EXIT_FAILURE);
+    clock_t startTime;
+    int i, N, input, count;
+    int* inputN, *inputTMP;
+    double endTime;
+    char* ptr;
     FILE *fp;
 
-    N = atoi(argv[1]);
-    if ( N == 0) exit(EXIT_FAILURE); // If argv[1] is not integer or 0
+    N = strtol(argv[1], &ptr, 10);
+    count = 0;
+    if ( *ptr != '\0' ) exit(EXIT_FAILURE); // If argv[1] is not integer
+    if ( N == 0) exit(EXIT_FAILURE); // If argv[1] is 0 
     inputN = (int*)malloc(sizeof(int) * N);
+    inputTMP = (int*)malloc(sizeof(int) * N);
 
     //Read File
     fp = fopen(argv[2], "r");
-    if (fp == NULL) exit(EXIT_FAILURE); // If file doesn't exist
+    // If file doesn't exist
+    if (fp == NULL) exit(EXIT_FAILURE);
     for ( i = 0; i < N; i++) {
         if ((fscanf(fp, "%d\n", &input)) == EOF){//if N>K
             N = i;
@@ -45,16 +53,28 @@ int main (int argc, char* argv[]) {
         }
         inputN[i] = input;
     }
-    fclose(fp);// Free fp
+    fclose(fp);
+    memcpy(inputTMP, inputN, N * sizeof(int));
 
-    startTime = clock(); // Starting Time Checking
-    InsertionSort(inputN, N);
-    endTime = clock() - startTime;
-    
-    PrintArr(inputN, N);
-    //Print sorting time by milliseconds
-    printf("Running time = %f ms\n", ((float)(endTime) / (CLOCKS_PER_SEC / 1000)) );
+    // Starting Time Checking
+    startTime = clock(); 
+    InsertionSort(inputTMP, N);
+    // If elapsed time is less then 0ms
+    if ( (clock() - startTime) < 1000 ) {
+        do {
+            count++;
+            // Copy origin data to inputTMP whenever loop started
+            memcpy(inputTMP, inputN, N * sizeof(int)); 
+            InsertionSort(inputTMP, N);
+        } while ( clock() - startTime < 1000);
+    }
+    else count++;
+    endTime = (double)(clock() - startTime) / (CLOCKS_PER_SEC / 1000);
 
-    free(inputN);// Free inputN
+    PrintArr(inputTMP, N);
+    printf("Running time = %f ms\n", (double)(endTime / count) );
+
+    free(inputN);
+    free(inputTMP);
     return 0;
 }
