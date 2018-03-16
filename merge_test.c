@@ -1,5 +1,5 @@
 //Copyright to 20145523 KimSangHeon
-//Last updated date : 2018-03-05
+//Last updated date : 2018-03-16
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,83 +7,89 @@
 
 //Print Result Function
 void PrintArr (int* input, int N) {
-    for ( int i = 0; i < N; i++) {
+    int i;
+    for ( i = 0; i < N; i++) {
         printf("%d\n", input[i]);
     }
 }
 //Merge Function
-void Merge (int* input, int Left, int Right, int N){
-    int* tmp;
+void Merge (int* inputORG, int* inputSOR, int left, int mid, int right) {
     int i, j, k;
-    i = Left;
-    j = Right + 1;
-    k = 0;
-    tmp = (int*)malloc(sizeof(int) * N);
-    while ( i <= Right && j <= N) {
-        if ( input[i] > input[j] ) {
-            tmp[k++] = input[i++];
+    i = left;
+    j = mid + 1;
+    k = left;
+
+    while ( i <= mid && j <= right ) {
+        if ( inputORG[i] >= inputORG[j] ) {
+            inputORG[k++] = inputORG[i++];
         }
         else {
-            tmp[k++] = input[j++];
+            inputORG[k++] = inputORG[j++];
         }
     }
-    //If still remaining things are exist
-    while (i < Left) tmp[k++] = input[i++];
-    while (j < Right) tmp[k++] = input[j++];
-    while (--k >= 0) input[Left + k] = tmp[k];
+
+    while ( i <= mid ) inputORG[k++] = inputORG[i++];
+    while ( j <= right ) inputORG[k++] = inputORG[j++];
 }
 //Merge Sorting Function
-void MergeSort (int* input, int N) {
+void MergeSort (int* inputORG, int* inputSOR, int left, int right) {
     int mid;
-    int Left, Right;
-
-    Left = N / 2;
-    Right = N - Left;
-    
-    if (Left < Right) {
-        
+    if ( left < right ) {
+        mid = (left + right) / 2;
+        MergeSort(inputORG, inputSOR, left, mid);
+        MergeSort(inputORG, inputSOR, mid + 1, right);
+        Merge(inputORG, inputSOR, left, mid, right);
     }
-    //Keep spliting till less then two components left
-    MergeSort(Left, mid);
-    MergeSort(Right, N - mid);
-    //Merge splited arrays
-    Merge(input, Left, Right, N);
-
-    free(Left);
-    free(Right); //Free memory
 }
 
 int main (int argc, char* argv[]) {
-    if (argc != 3 ) exit(EXIT_FAILURE); // Wrong input
-    clock_t startTime, endTime;
-    int i, N, input;
-    int* inputN;
+    // ERROR : Wrong command line input
+    if (argc != 3 ) exit(EXIT_FAILURE);
+    clock_t startTime;
+    int i, N, input, count;
+    int* inputSOR, *inputORG;
+    double endTime;
+    char* ptr;
     FILE *fp;
 
-    N = atoi(argv[1]);
-    if ( N == 0) exit(EXIT_FAILURE); // If argv[1] is not integer or 0
-    inputN = (int*)malloc(sizeof(int) * N);
+    N = strtol(argv[1], &ptr, 10);
+    count = 0;
+    if ( *ptr != '\0' ) exit(EXIT_FAILURE); // ERROR : If argv[1] is not integer
+    if ( N == 0) exit(EXIT_FAILURE); // ERROR :  If argv[1] is 0 
+    inputSOR = (int*)malloc(sizeof(int) * N);
+    inputORG = (int*)malloc(sizeof(int) * N);
 
     //Read File
     fp = fopen(argv[2], "r");
-    if (fp == NULL) exit(EXIT_FAILURE); // If file doesn't exist
-    for ( i = 0; i < N; i++) {
-        if ((fscanf(fp, "%d\n", &input)) == EOF){// If N > K
+    // ERROR : If file doesn't exist
+    if ( fp == NULL ) exit(EXIT_FAILURE);
+    for ( i = 0; i < N; i++ ) {
+        if ((fscanf(fp, "%d\n", &input)) == EOF ){// If N>K
             N = i;
             break;
         }
-        inputN[i] = input;
+        inputORG[i] = input;
     }
-    fclose(fp);// Free fp
+    fclose(fp);
 
-    startTime = clock(); // Starting Time Checking  
-    MergeSort(inputN, N);
-    endTime = clock() - startTime;
+    startTime = clock(); 
+    MergeSort(inputORG, inputSOR, 0, N - 1);
+    // ERROR :  If elapsed time is less then 1000ms
+    if ( (clock() - startTime) < 1000 ) {
+        do {
+            count++;
+            // Copy origin data to sorted array whenever loop started
+            memcpy(inputSOR, inputORG, N * sizeof(int)); 
+            MergeSort(inputORG, inputSOR, 0, N - 1);
+        } while ( clock() - startTime < 1000 );
+    }
+    else count++;
+    endTime = (double)(clock() - startTime) / (CLOCKS_PER_SEC / 1000);
 
-    PrintArr(inputN, N);
-    //Print sorting time by milliseconds
-    printf("Running time = %d ms\n", ((int)(endTime)) );
+    PrintArr(inputSOR, N);
+    printf("Running time = %f ms\n", (double)(endTime / count) );
 
-    free(inputN);// Free inputN
+    free(inputSOR);
+    free(inputORG);
     return 0;
 }
