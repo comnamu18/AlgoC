@@ -1,9 +1,9 @@
 '''
 20145523 KimSangHeon
-Last updated date : 2018-03-09
+Last updated date : 2018-03-17
 '''
 import sys
-import datetime
+import time
 import gc
 
 #Print Result Function
@@ -21,28 +21,47 @@ def InsertionSort (inputN, N) :
             j = j - 1
 
 #Main part
-if len(sys.argv) != 3: sys.exit('wrong input length')
-fp = open(sys.argv[2],"r")
-if fp is None: sys.exit('wrong input in file name(argv[2])')
-N = int(sys.argv[1])
-if type(N) is not int: sys.exit('wrong input in number(argv[1])')
+if len(sys.argv) != 3: sys.exit('wrong input length') #ERROR : Wrong command line input
+try :
+    fp = open(sys.argv[2],"r")
+except FileNotFoundError as e:
+    print(str(e)) # ERROR : If file doesn't exist
+try:
+    N = int(sys.argv[1])
+except ValueError as e:
+    print(str(e)) # ERROR : If argv[1] is not integer
+if N == 0 : sys.exit(0) # ERROR : If argv[1] is 0
 inputN = []
 
 #read data
-for i in range(0,N):
-    inp = int(fp.readline())
-    if inp == '':#if N > K
-        N = i
-        break
+for i in range(0, N):
+    try:
+        inp = int(fp.readline())
+        if inp == '':#if N > K
+            N = i
+            break
+    # ERROR : If file has data which is not integer
+    except ValueError as e:
+        print(str(e))
 
     inputN.append(inp)
-
+inputTMP = inputN[:]
 fp.close()
+count = 0
 
-startTime = datetime.datetime.now()
+startTime = time.monotonic()
 InsertionSort(inputN, N)
-endTime = datetime.datetime.now() - startTime
+# ERROR : If elapsed time is less then 1000ms
+if (time.monotonic() - startTime) < 1.000:
+    while time.monotonic() - startTime < 1.000:
+        count += 1
+        # Copy origin data to inputN whenever loop started
+        inputN = inputTMP[:]
+        InsertionSort(inputN, N)
+else:
+    count = 1
+endTime = time.monotonic() - startTime
 
 printArr(inputN)
-print("Running time = " + str(int(endTime.total_seconds() * 1000)) + "ms")
+print("Running time = " + str(endTime * 1000 / count) + " ms")
 gc.collect()# free any kind of garbage memory
