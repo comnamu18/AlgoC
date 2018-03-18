@@ -1,5 +1,5 @@
 /*Copyright to 20145523 KimSangHeon
-Last updated date : 2018-03-16*/
+Last updated date : 2018-03-17*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,48 +13,44 @@ void PrintArr ( int* input, int N ) {
     }
 }
 //Merge Function
-void Merge ( int* input, int* Left, int* Right, int N ) {
-    int i, j, k, LeftN, RightN;
-    i = 0;
-    j = 0;
+void Merge ( int* input, int low, int mid, int high ) {
+    int i, j, k;
+    int *tmp;
+
+    tmp = (int*)malloc( (high - low + 1) * sizeof(int));
+    i = low;
+    j = mid + 1;
     k = 0;
-    LeftN = N / 2;
-    RightN = N - LeftN;
     //Compare Left block and Right block
-    while ( i < LeftN && j < RightN) {
-        if ( Left[i] > Right[j] ) {
-            input[k++] = Left[i++];
+    while ( i <= mid && j <= high ) {
+        if ( input[i] > input[j] ) {
+            tmp[k++] = input[i++];
         }
         else {
-            input[k++] = Right[j++];
+            tmp[k++] = input[j++];
         }
     }
     //If still remaining instances are exist
-    while (i < LeftN) input[k++] = Left[i++];
-    while (j < RightN) input[k++] = Right[j++];
+    while (i <= mid) tmp[k++] = input[i++];
+    while (j <= high) tmp[k++] = input[j++];
+    
+    for ( i = 0; i < k; i++) {
+        input[low + i] = tmp[i];
+    }
+
+    free(tmp);
 }
 //Merge Sorting Function
-void MergeSort ( int* input, int N ) {
+void MergeSort ( int* input, int low, int high ) {
     int mid;
-    int *Left, *Right;
-
-    if (N < 2) return; //If array has less then two components, stop spliting
-
-    mid = N / 2;
-    Left = (int*)malloc(mid*sizeof(int));
-    Right = (int*)malloc((N-mid)*sizeof(int));
-    //Split input Array into Two arrays
-    memcpy(Left, input, mid * sizeof(int));
-    memcpy(Right, input + mid, (N - mid) * sizeof(int));
-    
-    //Keep spliting till less then two components left
-    MergeSort(Left, mid);
-    MergeSort(Right, N - mid);
-    //Merge splited arrays
-    Merge(input, Left, Right, N);
-
-    free(Left);
-    free(Right);
+    if(high > low) {
+        mid = (low + high) / 2;
+        // Keep spliting
+        MergeSort(input, low, mid);
+        MergeSort(input, mid + 1, high);
+        // 
+        Merge(input, low, mid, high);
+    }
 }
 
 int main ( int argc, char* argv[] ) {
@@ -89,14 +85,14 @@ int main ( int argc, char* argv[] ) {
     memcpy(inputORG, inputN, N * sizeof(int));
 
     startTime = clock(); 
-    MergeSort(inputN, N);
+    MergeSort(inputN, 0, N - 1);
     // ERROR : If elapsed time is less then 1000ms
     if ( (clock() - startTime) < 1000 ) {
         do {
             count++;
             // Copy origin data to inputN whenever loop started
             memcpy(inputN, inputORG, N * sizeof(int)); 
-            MergeSort(inputN, N);
+            MergeSort(inputN, 0, N - 1);
         } while ( clock() - startTime < 1000 );
     }
     else count++;
