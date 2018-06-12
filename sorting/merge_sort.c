@@ -16,7 +16,6 @@ void PrintArr ( int* input, int N ) {
 void Merge ( int* input, int low, int mid, int high ) {
     int i, j, k;
     int *tmp;
-
     tmp = (int*)malloc( (high - low + 1) * sizeof(int));
     i = low;
     j = mid + 1;

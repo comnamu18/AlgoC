@@ -4,6 +4,7 @@ Last updated date : 2018-03-17
 '''
 import sys
 import time
+import gc
 
 #Print Result Function
 def printArr(inputN):
@@ -63,3 +64,4 @@ endTime = time.monotonic() - startTime
 
 printArr(inputN)
 print("Running time = " + str(endTime * 1000 / count) + " ms")
+gc.collect()# free any kind of garbage memory
